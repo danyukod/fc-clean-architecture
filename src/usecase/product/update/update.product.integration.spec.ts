@@ -61,4 +61,39 @@ describe("Test update product use case", () => {
 
         await expect(usecase.execute(input)).rejects.toThrowError("Product not found");
     });
+
+    it("should throw error when product name is empty", async () => {
+        const productRepository = new ProductRepository();
+        const usecase = new UpdateProductUseCase(productRepository);
+
+        const product = ProductFactory.createWithId("Product A", 10);
+
+        await productRepository.create(product);
+
+        const input: InputUpdateProductDto = {
+            id: product.id,
+            name: "",
+            price: 20,
+        }
+
+        await expect(usecase.execute(input)).rejects.toThrowError("Name is required");
+
+    });
+
+    it("should throw error when product price is negative", async () => {
+        const productRepository = new ProductRepository();
+        const usecase = new UpdateProductUseCase(productRepository);
+
+        const product = ProductFactory.createWithId("Product A", 10);
+
+        await productRepository.create(product);
+
+        const input: InputUpdateProductDto = {
+            id: product.id,
+            name: "Product B",
+            price: -20,
+        }
+
+        await expect(usecase.execute(input)).rejects.toThrowError("Price must be greater than zero");
+    });
 });
